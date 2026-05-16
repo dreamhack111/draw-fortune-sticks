@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黄大仙求签</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'STKaiti', 'KaiTi', 'SimSun', serif; background: linear-gradient(180deg, #2d5016 0%, #1a3310 40%, #0d1f08 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        .container { text-align: center; width: 100%; max-width: 600px; padding: 20px; position: relative; }
+        .title { color: #ffd700; font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .huangli { background: linear-gradient(180deg, #f5f0e1 0%, #e8dcc8 100%); border: 3px solid #3d5a20; border-radius: 12px; padding: 20px; margin-bottom: 35px; color: #2d4a16; box-shadow: 0 5px 18px rgba(0,0,0,0.3), inset 0 0 30px rgba(74, 124, 35, 0.05); }
+        .huangli-title { font-size: 1.4em; color: #2d4a16; margin-bottom: 12px; font-weight: bold; text-align: center; border-bottom: 2px solid #4a7c23; padding-bottom: 8px; }
+        .huangli-content { font-size: 1.05em; line-height: 2; }
+        .jiazi { font-size: 1.3em; color: #8b4513; margin-bottom: 8px; text-align: center; font-weight: bold; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .gourd { position: relative; width: 160px; height: 250px; margin: 0 auto; cursor: pointer; transition: transform 0.3s; transform-origin: bottom center; }
+        .gourd:hover { transform: scale(1.05); }
+        .gourd.shaking { animation: shake 3s ease-in-out; }
+        @keyframes shake { 
+            0%, 100% { transform: rotate(0deg); } 
+            8.33% { transform: rotate(-15deg); } 
+            16.66% { transform: rotate(12deg); } 
+            25% { transform: rotate(-10deg); } 
+            33.33% { transform: rotate(8deg); } 
+            41.66% { transform: rotate(-6deg); } 
+            50% { transform: rotate(5deg); } 
+            58.33% { transform: rotate(-4deg); } 
+            66.66% { transform: rotate(3deg); } 
+            75% { transform: rotate(-2deg); } 
+            83.33% { transform: rotate(1deg); } 
+            91.66% { transform: rotate(-1deg); } 
+        }
+        .gourd-body { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 170px; background: linear-gradient(90deg, #6b4423 0%, #8b6914 20%, #a08020 35%, #b8a050 50%, #a08020 65%, #8b6914 80%, #6b4423 100%); border-radius: 5px 5px 12px 12px; box-shadow: inset -5px 0 15px rgba(0,0,0,0.4), inset 5px 0 15px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.4); border: 2px solid #4a3010; }
+        .gourd-body::before { content: ''; position: absolute; top: 30px; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #4a3010 0%, #6b4423 50%, #4a3010 100%); }
+        .gourd-body::after { content: ''; position: absolute; top: 70px; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, #4a3010 0%, #6b4423 50%, #4a3010 100%); }
+        .gourd-rim { position: absolute; bottom: 160px; left: 50%; transform: translateX(-50%); width: 150px; height: 15px; background: linear-gradient(180deg, #8b6914 0%, #7a5a12 50%, #6b4423 100%); border-radius: 8px 8px 0 0; box-shadow: inset 0 3px 8px rgba(255,255,255,0.3), inset 0 -2px 5px rgba(0,0,0,0.2); border: 2px solid #4a3010; border-bottom: none; }
+        .gourd-rim::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #8b0000; }
+        .gourd-red-band { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); width: 130px; height: 12px; background: linear-gradient(180deg, #cc0000 0%, #8b0000 50%, #5a0000 100%); border-radius: 2px; box-shadow: 0 2px 6px rgba(139, 0, 0, 0.5); }
+        .gourd-text { position: absolute; bottom: 55px; left: 50%; transform: translateX(-50%); color: #cc0000; font-size: 2.8em; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .gourd-lines { position: absolute; bottom: 50px; left: 0; right: 0; }
+        .gourd-line { position: absolute; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #4a3010 0%, #6b4423 50%, #4a3010 100%); }
+        .gourd-line:nth-child(1) { top: 0; }
+        .gourd-line:nth-child(2) { top: 18px; }
+        .gourd-line:nth-child(3) { top: 36px; }
+        .sticks-container { position: absolute; bottom: 155px; left: 50%; transform: translateX(-50%); width: 100px; height: 85px; }
+        .stick { position: absolute; bottom: 0; width: 6px; background: linear-gradient(90deg, #d4c4a8 0%, #e8d8b8 50%, #d4c4a8 100%); border-radius: 2px 2px 0 0; transform-origin: bottom center; }
+        .stick::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 3px solid transparent; border-right: 3px solid transparent; border-bottom: 10px solid #e8d8b8; }
+        .stick::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 2px solid transparent; border-right: 2px solid transparent; border-bottom: 6px solid #cc0000; }
+        .stick:nth-child(1) { left: 5px; height: 65px; transform: rotate(-10deg); }
+        .stick:nth-child(2) { left: 16px; height: 80px; transform: rotate(-4deg); }
+        .stick:nth-child(3) { left: 28px; height: 70px; transform: rotate(4deg); }
+        .stick:nth-child(4) { left: 40px; height: 82px; transform: rotate(-3deg); }
+        .stick:nth-child(5) { left: 52px; height: 76px; transform: rotate(5deg); }
+        .stick:nth-child(6) { left: 64px; height: 72px; transform: rotate(-6deg); }
+        .stick:nth-child(7) { left: 76px; height: 80px; transform: rotate(3deg); }
+        .stick:nth-child(8) { left: 88px; height: 68px; transform: rotate(-8deg); }
+        .instruction { color: #ffd700; font-size: 1.2em; margin-top: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .fortune-stick-display { background: linear-gradient(180deg, #98d89d 0%, #4a7c23 40%, #3d5a20 100%); border-radius: 8px; padding: 35px 25px; margin: 20px auto; max-width: 320px; box-shadow: 0 8px 25px rgba(0,0,0,0.4), inset 0 0 30px rgba(255,255,255,0.08); cursor: pointer; transition: transform 0.3s; border: 3px solid #1a3310; position: relative; }
+        .fortune-stick-display::before { content: ''; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 70%; height: 4px; background: linear-gradient(90deg, transparent 0%, #1a3310 20%, #1a3310 80%, transparent 100%); }
+        .fortune-stick-display::after { content: ''; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 50%; height: 4px; background: linear-gradient(90deg, transparent 0%, #1a3310 30%, #1a3310 70%, transparent 100%); }
+        .fortune-stick-display:hover { transform: scale(1.02); }
+        .stick-number { font-size: 4.5em; color: #8b0000; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 15px; letter-spacing: 10px; }
+        .stick-level { font-size: 1.6em; color: #1a3310; margin-bottom: 12px; font-weight: bold; }
+        .stick-title { font-size: 1.9em; color: #1a3310; margin-bottom: 18px; font-weight: bold; }
+        .stick-ancient-text { font-size: 1.1em; color: #1a3310; line-height: 2; font-style: italic; border-top: 2px solid #2d5016; padding-top: 15px; }
+        .stick-detail { background: linear-gradient(180deg, #f5f0e1 0%, #e8dcc8 100%); border: 3px solid #3d5a20; border-radius: 12px; padding: 30px; margin: 20px auto; max-width: 520px; color: #2d4a16; box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 0 40px rgba(74, 124, 35, 0.05); position: relative; }
+        .stick-detail::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 6px; background: linear-gradient(90deg, #8b4513 0%, #a0522d 50%, #8b4513 100%); border-radius: 3px 3px 0 0; }
+        .detail-number { font-size: 3em; color: #8b0000; margin-bottom: 12px; font-weight: bold; }
+        .detail-level { font-size: 1.4em; color: #8b4513; margin-bottom: 12px; }
+        .detail-title { font-size: 2em; color: #2d4a16; margin-bottom: 18px; font-weight: bold; border-bottom: 2px solid #4a7c23; padding-bottom: 10px; }
+        .detail-ancient { font-size: 1.15em; line-height: 2.2; color: #3d5a20; font-style: italic; border-left: 4px solid #4a7c23; padding-left: 18px; margin-top: 20px; background: rgba(74, 124, 35, 0.08); padding: 15px; border-radius: 0 8px 8px 0; }
+        .button-group { display: flex; justify-content: center; gap: 40px; margin-top: 30px; }
+        .btn { padding: 15px 45px; font-size: 1.2em; border: 2px solid #5d4e37; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-family: inherit; font-weight: bold; }
+        .btn-dian { background: linear-gradient(180deg, #d2691e 0%, #8b4513 50%, #654321 100%); color: #fff; box-shadow: 0 4px 12px rgba(139, 69, 19, 0.5), inset 0 1px 2px rgba(255,255,255,0.2); }
+        .btn-dian:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(139, 69, 19, 0.6); }
+        .btn-jie { background: linear-gradient(180deg, #4a7c23 0%, #2d5016 50%, #1a3310 100%); color: #ffd700; box-shadow: 0 4px 12px rgba(45, 80, 22, 0.5), inset 0 1px 2px rgba(255,255,255,0.2); }
+        .btn-jie:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(45, 80, 22, 0.6); }
+        .btn-back { background: linear-gradient(180deg, #6b7b8a 0%, #4a5568 50%, #2d3748 100%); color: #fff; padding: 12px 35px; font-size: 1.1em; margin-top: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.1); }
+        .btn-back:hover { transform: translateY(-2px); }
+        .sub-page { background: linear-gradient(180deg, #f5f0e1 0%, #e8dcc8 100%); border: 3px solid #3d5a20; border-radius: 12px; padding: 35px; margin: 20px auto; max-width: 620px; color: #2d4a16; box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 0 40px rgba(74, 124, 35, 0.05); text-align: left; line-height: 2.2; position: relative; }
+        .sub-page::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 75%; height: 6px; background: linear-gradient(90deg, #8b4513 0%, #a0522d 50%, #8b4513 100%); border-radius: 3px 3px 0 0; }
+        .sub-page h2 { color: #2d4a16; text-align: center; margin-bottom: 25px; font-size: 2em; font-weight: bold; border-bottom: 2px solid #4a7c23; padding-bottom: 12px; }
+        .sub-page p { font-size: 1.2em; text-indent: 2em; line-height: 2.4; }
+        .prediction-section { margin-top: 28px; padding: 20px; background: linear-gradient(180deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.08) 100%); border-radius: 10px; border-left: 5px solid #daa520; border-top: 1px solid rgba(218, 165, 32, 0.3); }
+        .prediction-title { font-size: 1.3em; color: #8b4513; font-weight: bold; margin-bottom: 15px; text-align: center; }
+        .prediction-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .prediction-item { background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 240, 225, 0.9) 100%); padding: 15px; border-radius: 8px; border: 1px solid rgba(74, 124, 35, 0.2); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .prediction-label { font-size: 0.95em; color: #4a7c23; margin-bottom: 6px; font-weight: bold; text-align: center; }
+        .prediction-value { font-size: 1em; color: #2d4a16; font-weight: 500; text-align: center; line-height: 1.5; }
+        .attention-section { margin-top: 28px; padding: 20px; background: linear-gradient(180deg, rgba(238, 173, 173, 0.35) 0%, rgba(238, 173, 173, 0.2) 100%); border-radius: 10px; border-left: 5px solid #8b0000; border-top: 1px solid rgba(139, 0, 0, 0.2); }
+        .attention-title { font-size: 1.3em; color: #8b0000; font-weight: bold; margin-bottom: 15px; text-align: center; }
+        .attention-list { list-style: none; padding-left: 0; }
+        .attention-list li { position: relative; padding-left: 25px; margin-bottom: 10px; font-size: 1.05em; color: #3d5a20; line-height: 1.6; }
+        .attention-list li::before { content: '◆'; position: absolute; left: 5px; color: #8b0000; font-size: 0.9em; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fallDown { 0% { transform: translateY(-100px) rotate(0deg); opacity: 0; } 50% { transform: translateY(50px) rotate(180deg); opacity: 1; } 100% { transform: translateY(0) rotate(360deg); opacity: 1; } }
+        .stick-fall { animation: fallDown 1s ease-out forwards; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">黄大仙求签</h1>
+        
+        <div id="homePage" class="page active">
+            <div class="huangli" id="huangli">
+                <div class="huangli-title">今日黄历</div>
+                <div class="jiazi" id="jiazi"></div>
+                <div class="huangli-content" id="huangliContent"></div>
+            </div>
+            
+            <div class="gourd" id="gourd" onclick="shakeGourd()">
+                <div class="sticks-container">
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                    <div class="stick"></div>
+                </div>
+                <div class="gourd-rim"></div>
+                <div class="gourd-body">
+                    <div class="gourd-lines">
+                        <div class="gourd-line"></div>
+                        <div class="gourd-line"></div>
+                        <div class="gourd-line"></div>
+                    </div>
+                    <div class="gourd-text">签</div>
+                    <div class="gourd-red-band"></div>
+                </div>
+            </div>
+            
+            <p class="instruction">点击签筒求签</p>
+        </div>
+
+        <div id="stickRevealPage" class="page">
+            <div class="fortune-stick-display" id="fortuneStick" onclick="showFortuneDetail()">
+                <div class="stick-number" id="stickNumber"></div>
+                <div class="stick-level" id="stickLevel"></div>
+                <div class="stick-title" id="stickTitle"></div>
+                <div class="stick-ancient-text" id="stickAncientText"></div>
+            </div>
+            <p class="instruction">点击签枝查看详情</p>
+        </div>
+
+        <div id="fortuneDetailPage" class="page">
+            <div class="stick-detail">
+                <div class="detail-number" id="detailNumber"></div>
+                <div class="detail-level" id="detailLevel"></div>
+                <div class="detail-title" id="detailTitle"></div>
+                <div class="detail-ancient" id="detailAncientText"></div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-dian" onclick="showDianGu()">典故</button>
+                <button class="btn btn-jie" onclick="showJieQian()">解签</button>
+            </div>
+            
+            <button class="btn btn-back" onclick="backToHome()">重新求签</button>
+        </div>
+
+        <div id="dianguPage" class="page">
+            <div class="sub-page">
+                <h2 id="dianguTitle"></h2>
+                <p id="dianguContent"></p>
+            </div>
+            <button class="btn btn-back" onclick="backToDetail()">返回</button>
+        </div>
+
+        <div id="jieqianPage" class="page">
+            <div class="sub-page">
+                <h2 id="jieqianTitle"></h2>
+                <p id="jieqianContent"></p>
+                
+                <div class="prediction-section">
+                    <div class="prediction-title">分项预示</div>
+                    <div class="prediction-grid">
+                        <div class="prediction-item">
+                            <div class="prediction-label">财运</div>
+                            <div class="prediction-value" id="prediction-wealth"></div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-label">事业</div>
+                            <div class="prediction-value" id="prediction-career"></div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-label">学业</div>
+                            <div class="prediction-value" id="prediction-study"></div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-label">谋事</div>
+                            <div class="prediction-value" id="prediction-planning"></div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-label">感情</div>
+                            <div class="prediction-value" id="prediction-love"></div>
+                        </div>
+                        <div class="prediction-item">
+                            <div class="prediction-label">健康</div>
+                            <div class="prediction-value" id="prediction-health"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attention-section">
+                    <div class="attention-title">注意事项</div>
+                    <ul class="attention-list" id="attentionList"></ul>
+                </div>
+            </div>
+            <button class="btn btn-back" onclick="backToDetail()">返回</button>
+        </div>
+    </div>
+
+    <script>
+        const fortunes = [
+            { number: 1, level: "上上", title: "混沌初开", ancient: "混沌未分，乾坤未定。天地玄黄，宇宙洪荒。日月盈昃，辰宿列张。寒来暑往，秋收冬藏。", diangu: "相传天地之初，一片混沌，无天无地，无日无月。直至盘古开天辟地，混沌始分，清气上升为天，浊气下沉为地，始有万物。此签寓意天地初开，万物始生，凡事开头皆有可能。", jieqian: "此签为上上吉签，象征万事开头顺利，运势极佳。若问事业，有开创之象；若问感情，有新生之机；若问学业，有进步之兆。凡事从头做起，皆能顺利发展，前途光明。" },
+            { number: 2, level: "上中", title: "伏羲画卦", ancient: "太极生两仪，两仪生四象，四象生八卦。八卦定吉凶，吉凶生大业。", diangu: "伏羲氏观天象、察地理，中华人始作八卦，以阴阳爻配合天地人之变化，推演宇宙万物之理。八卦可占卜天地人事吉凶祸福，此为中华预测学之源头。", jieqian: "此签为上中吉签，表示凡事皆有其规律可循。若问行事，当遵循天道，顺其自然；若问求谋，当深思熟虑，谋定而后动。运势平稳，只要按部就班，便能水到渠成。" },
+            { number: 3, level: "上下", title: "神农尝百草", ancient: "神农氏出，民知稼穑。他山之石，可以攻玉。药食同源，养生之道。", diangu: "神农氏教民耕种，尝百草以知药性，一日而遇七十毒，终著《神农本草经》，为中医药学之祖。其牺牲精神，泽被后世。", jieqian: "此签为上下吉签，象征经历艰辛方得收获。若问健康，当注意调养身体，勿过劳累；若问事业，须经一番努力方能成功。提醒求签者要有付出方有收获。" },
+            { number: 4, level: "中上", title: "黄帝战蚩尤", ancient: "涿鹿之战，蚩尤作乱。黄帝征召诸侯，与之战于涿鹿。终擒而杀之，天下乃定。", diangu: "黄帝与蚩尤大战于涿鹿，蚩尤能作大雾，黄帝得风后力牧相助，终于擒杀蚩尤，统一中原，为华夏文明之始。", jieqian: "此签为中上吉签，表示虽有波折但终能成功。若问事业或感情，可能遇到阻碍，但最终能克服困难，获得胜利。关键在于坚持到底。" },
+            { number: 5, level: "中平", title: "尧舜禅让", ancient: "尧舜禹汤，文武成康。上下五千年，仁义礼智信。禅让之美德，千古永流传。", diangu: "尧帝年老，让位于舜；舜帝年老，让位于禹。此禅让之美德，被后世儒家奉为理想政治之典范。", jieqian: "此签为中平签，表示运势平稳，不宜冒进。若问行事，当守成持正，不宜有太大变动。适合平稳发展，静待时机。" },
+            { number: 6, level: "中平", title: "大禹治水", ancient: "洪水滔天，鲧窃天帝息壤以堙洪水。不待帝命，帝令祝融杀鲧。禹承父业，疏通九河。", diangu: "大禹受命治水，三过家门而不入，终以疏导之法成功治理洪水。其敬业精神，成为后世楷模。", jieqian: "此签为中平签，提示若遇困难，当另辟蹊径，不宜硬碰硬。治水用疏不用堵，为人处世亦当如此。运势尚可，耐心等待。" },
+            { number: 7, level: "中下", title: "商汤灭夏", ancient: "夏桀无道，汤伐之。鸣条之战，夏亡商兴。革命顺天，应乎人时。", diangu: "夏桀暴虐无道，商汤起兵伐夏，建立商朝。此为中国历史第一次改朝换代，揭示天命无常，惟德是辅。", jieqian: "此签为中下签，表示时运不济，宜守不宜动。若问求谋，恐有小人作祟；当谨言慎行，低调行事。待时运转好，方可有所作为。" },
+            { number: 8, level: "下上", title: "武王伐纣", ancient: "商纣暴虐，周武王伐之。牧野之战，倒戈相向。商朝覆灭，周朝兴起。", diangu: "周武王起兵伐纣，纣王兵败自焚，商朝灭亡。周朝建立，实行分封制与宗法制，礼乐文明大盛。", jieqian: "此签为下上签，暗示虽有变革之机，但阻力不小。若问求谋，时机未到，尚需等待；若问感情，恐有变数。当积蓄力量，以待时机。" },
+            { number: 9, level: "下中", title: "周公吐哺", ancient: "周公者，周武王之弟也。沐浴三握发，一饭三吐哺，犹恐失天下之士。", diangu: "周公辅佐成王，制礼作乐，为周朝奠定八百年基业。其礼贤下士之美德，被后世传颂。", jieqian: "此签为下中签，表示运势较为一般，付出未必有相应回报。但若能保持谦虚态度，仍有转机。提醒勿急功近利。" },
+            { number: 10, level: "下下", title: "烽火戏诸侯", ancient: "周幽王宠褒姒，褒姒不好笑。王欲见之，乃举烽火。诸侯至而无寇，褒姒乃大笑。", diangu: "周幽王为博褒姒一笑，点燃烽火戏弄诸侯。后犬戎入侵，再举烽火，诸侯不来，王遂死于骊山之下。", jieqian: "此签为下下签，为大凶之兆。表示诚信已失，难以取信于人。若问行事，恐有破财之灾；若问感情，恐有变故。当谨慎小心，避免冒险。" },
+            { number: 11, level: "上上", title: "春秋五霸", ancient: "齐桓公、晋文公、宋襄公、秦穆公、楚庄王，并称五霸，尊王攘夷，称霸诸侯。", diangu: "春秋时期，周王室衰微，五大诸侯国君凭借武功和德行，成为霸主，维护华夏文明，抵御外族入侵。", jieqian: "此签为上上吉签，表示运势极强，有称霸一方之象。若问事业，可大胆进取；若问学业，可名列前茅。诸事顺遂，可以放心去做。" },
+            { number: 12, level: "上中", title: "孔子周游列国", ancient: "孔子适郑，与弟子相失。郑人或谓子贡曰：'东门有人，其颊似尧，其项类皋陶，其肩类子产。'", diangu: "孔子率众弟子周游列国，推行仁政德治，虽不得重用，但其学说影响深远，终成万世师表。", jieqian: "此签为上中吉签，象征理想与现实的差距。若问学业，已有积累但尚未成功；若问事业，还需继续努力。提醒贵在坚持，终有成就。" },
+            { number: 13, level: "上下", title: "老子出关", ancient: "老子骑青牛，西出函谷关。关令尹喜望见紫气东来，知有圣人至。老子乃著《道德经》五千言。", diangu: "老子为道家学派创始人，骑青牛西出函谷关，应关令尹喜之请，著《道德经》而不知所终。其思想影响深远。", jieqian: "此签为上下吉签，暗示有隐世之兆。若问功名，宜退不宜进；若问感情，恐有分离。适合修身养性，不宜强求。" },
+            { number: 14, level: "中上", title: "孙武练兵", ancient: "孙子武者，齐人。以兵法见于吴王阖闾。阖闾曰：'子之十三篇，吾尽观之矣。'", diangu: "孙武携《孙子兵法》见吴王，以宫女练兵，三令五申，终使宫女听令。其兵法思想至今仍被奉为经典。", jieqian: "此签为中上吉签，表示治军严谨，纪律分明。若问事业，当加强管理，严格执行；若问考试，当认真准备。运势良好，但需严于律己。" },
+            { number: 15, level: "中平", title: "越王勾践卧薪尝胆", ancient: "越王勾践反国，乃苦身焦思，置胆于坐，坐卧即仰胆，饮食亦尝胆也。", diangu: "越王勾践被吴王夫差打败，为吴国服役三年。归国后，睡薪草，尝苦胆，立志报仇，终于灭吴复国。", jieqian: "此签为中平签，表示身处逆境，当忍辱负重。若问学业或事业，须经历艰辛方能成功。提醒要有恒心和毅力。" },
+            { number: 16, level: "中平", title: "商鞅变法", ancient: "卫鞅闻令变法，法令如盟，赏罚必信。数年之间，秦国道不拾遗，山无盗贼。", diangu: "商鞅在秦国实行变法，奖励耕战，废除世卿世禄制度，使秦国走向富强，为秦始皇统一六国奠定基础。", jieqian: "此签为中平签，表示改革有望，但阻力较大。若问事业，须有破旧立新的决心；若问改革，当循序渐进。运势平稳。" },
+            { number: 17, level: "中下", title: "完璧归赵", ancient: "蔺相如完璧归赵，秦王不欲以城换璧。相如度秦王特以诈佯为予赵城，实不可得。", diangu: "蔺相如奉命携和氏璧入秦，见秦王无诚意，以智取回宝玉，完壁归赵。其智勇双全，传为佳话。", jieqian: "此签为中下签，暗示谈判或交涉可能不顺利。若问求财，恐有损失；若问感情，恐有争执。需谨慎处理。" },
+            { number: 18, level: "下上", title: "负荆请罪", ancient: "廉颇闻之，肉袒负荆，因宾客至蔺相如门谢罪。曰：'鄙贱之人，不知将军宽之至此也。'", diangu: "廉颇与蔺相如将相不和，蔺相如以国事为重，处处避让。廉颇知悉后，背负荆条，向蔺相如请罪，二人终成刎颈之交。", jieqian: "此签为下上签，象征知错能改。若问人际关系，当主动道歉，化解矛盾；若问事业，当放下身段，虚心求教。终能和谐相处。" },
+            { number: 19, level: "下中", title: "纸上谈兵", ancient: "赵括自少学兵法，言兵事，以天下莫能当。及其为将，长平之役，赵兵大败。", diangu: "赵括熟读兵书，但只会空谈，无实际作战经验。长平之战，赵括替代廉颇为将，大败于秦军，四十万赵卒被坑杀。", jieqian: "此签为下中签，表示空谈误国，实干兴邦。若问学业，恐有虚名难副之虞；若问事业，切忌夸夸其谈。当脚踏实地。" },
+            { number: 20, level: "下下", title: "秦始皇焚书坑儒", ancient: "秦始皇下令：非博士官所职，天下敢有藏《诗》《书》、百家语者，悉诣守、尉杂烧之。", diangu: "秦始皇统一六国后，为统一思想，下令焚烧《诗》《书》等典籍，后又坑杀儒生四百余人，是中国文化史上的重大浩劫。", jieqian: "此签为下下签，为凶兆。表示过于极端，必遭天谴。若问行事，勿行极端之事；若问人际，恐有纷争。当以和为贵。" },
+            { number: 21, level: "上上", title: "陈胜吴广起义", ancient: "王侯将相，宁有种乎！等死，死国可乎！斩木为兵，揭竿为旗，天下云合响应。", diangu: "秦末陈胜吴广在大泽乡起义，发出'王侯将相宁有种乎'的呐喊，动摇了秦朝统治，揭开秦末农民起义的序幕。", jieqian: "此签为上上吉签，表示当仁不让，舍我其谁。若问事业，有开创之机；若问改革，有突破之象。运势极佳，可以放手一搏。" },
+            { number: 22, level: "上中", title: "萧何月下追韩信", ancient: "信数与萧何语，何奇之。闻信亡，不及以闻，自追之。人有言上曰：'丞相何追。'", diangu: "韩信投奔刘邦，未得重用，欲离去。萧何深夜追赶韩信，极力向刘邦推荐，终使韩信被拜为大将军。", jieqian: "此签为上中吉签，暗示人才难得，伯乐更难寻。若问求职，当主动展示才华；若问感情，缘分已至。吉人自有天相。" },
+            { number: 23, level: "上下", title: "霸王别姬", ancient: "力拔山兮气盖世，时不利兮骓不逝。骓不逝兮可奈何，虞兮虞兮奈若何！", diangu: "项羽被困垓下，四面楚歌，慷慨悲歌，与虞姬诀别。虞姬自刎，项羽突围至乌江，自刎而死。", jieqian: "此签为上下吉签，象征英雄末路，情深不寿。若问感情，恐有生离死别之痛；若问事业，虽败犹荣。悲壮之美。" },
+            { number: 24, level: "中上", title: "四面楚歌", ancient: "夜闻汉军四面皆楚歌，项王乃大惊曰：'汉皆已得楚乎？是何楚人之多也！'", diangu: "项羽被困垓下，张良献计，让汉军夜唱楚歌，动摇楚军军心，终使项羽大败。", jieqian: "此签为中上签，表示陷入困境，四面受敌。若问事业，恐遇瓶颈；若问感情，恐有第三者。当冷静分析，找出突破口。" },
+            { number: 25, level: "中平", title: "胯下之辱", ancient: "淮阴屠中少年有侮信者，曰：'若虽长大，好带刀剑，中情怯耳。'众辱之，俯出胯下。", diangu: "韩信少年时曾受胯下之辱，但他并不以此时为耻，后终成大器，被封为淮阴侯。", jieqian: "此签为中平签，表示小不忍则乱大谋。若问事业，当能屈能伸；若问学业，勿因小辱而废大事。终有出头之日。" },
+            { number: 26, level: "中平", title: "背水一战", ancient: "信乃使万人先行，出背水阵。赵军望见，大笑之。平旦，信建大将旗鼓，井陉口与战。", diangu: "韩信伐赵，率军背水列阵，以示绝死之心。终于以少胜多，大破赵军。", jieqian: "此签为中平签，表示置于死地而后生。若问事业，需有破釜沉舟之决心；若问考试，当全力以赴。险中求胜。" },
+            { number: 27, level: "中下", title: "鸟尽弓藏", ancient: "范蠡遂去，自齐遗大夫种书曰：'蜚鸟尽，良弓藏；狡兔死，走狗烹。'", diangu: "越王勾践灭吴后，范蠡深知勾践可共患难不可共富贵，遂泛舟五湖而去。好友文种不听，终被勾践赐死。", jieqian: "此签为中下签，暗示功成身退，明哲保身。若问事业，当见好就收；若问感情，恐有卸磨杀驴之事。提醒知足常乐。" },
+            { number: 28, level: "下上", title: "霸王乌江自刎", ancient: "乃令骑皆下马步行，持短兵接战。独籍所杀汉军数百人。身被十余创。顾见汉骑司马吕马童曰：'若非吾故人乎？'", diangu: "项羽垓下突围，至乌江亭，乌江亭长请渡江，项羽以无颜见江东父老，不肯渡，遂自刎于乌江边。", jieqian: "此签为下上签，表示英雄末路，宁折不弯。若问学业，当有骨气；若问事业，宁可失败也不苟且。悲壮感人。" },
+            { number: 29, level: "下中", title: "指鹿为马", ancient: "赵高欲为乱，恐群臣不听，乃先设验。持鹿献于二世曰：'马也。'二世笑曰：'丞相误邪？谓鹿为马。'", diangu: "秦朝宰相赵高为测试群臣忠诚，将鹿说成马，顺己者说是马，逆己者加以迫害，终于独揽大权。", jieqian: "此签为下中签，表示颠倒黑白，是非不分。若问事业，恐遇小人；若问感情，恐有误会。当谨言慎行，勿轻信人言。" },
+            { number: 30, level: "下下", title: "秦二世而亡", ancient: "一夫作难而七庙隳，身死人手，为天下笑者，何也？仁义不施而攻守之势异也。", diangu: "秦始皇统一六国后，实行暴政，二世胡亥继位后更加残暴，终于引发农民起义，秦朝仅历两世便灭亡。", jieqian: "此签为下下签，表示失德必亡。若问事业，根基不稳；若问感情，基础不牢。当以仁义为本，勿行暴政。" },
+            { number: 31, level: "上上", title: "张良拾履", ancient: "良尝闲从容步游下邳圯上，有一老父衣褐，至良所，直堕其履圯下。顾谓良曰：'孺子，下取履！'", diangu: "张良在下邳桥上遇黄石公，黄石公故意将鞋掉到桥下，命张良拾鞋。张良强忍，为其拾鞋穿鞋。黄石公认为其可教，后授予《太公兵法》。", jieqian: "此签为上上吉签，表示能忍辱负重，必得贵人相助。若问学业，有意外收获；若问事业，得贵人提拔。运势极佳。" },
+            { number: 32, level: "上中", title: "萧规曹随", ancient: "参代何为汉相国，举事无所变更，一遵萧何约束。百姓歌之曰：'萧何为法，较若画一。'", diangu: "曹参继萧何为相，所有政策一依萧何旧制，无所变更。百姓作歌赞颂：'萧何为法，较若画一；曹参代之，守而勿失。'", jieqian: "此签为上中吉签，表示继承前志，稳健发展。若问学业，当继承优良传统；若问事业，当稳中求进。运势平稳。" },
+            { number: 33, level: "上下", title: "文景之治", ancient: "汉兴，接秦之敝，诸侯并起，民失作业，而大饥馑。高祖则致天诛，放纵而不约束。", diangu: "汉文帝、汉景帝实行轻徭薄赋、与民休息的政策，出现了中国历史上第一个盛世'文景之治'。", jieqian: "此签为上下吉签，表示太平盛世，风调雨顺。若问学业，当稳步前进；若问事业，当顺其自然。运势较好。" },
+            { number: 34, level: "中上", title: "晁错削藩", ancient: "晁错说上曰：'今削之亦反，不削亦反。削之，其反亟，祸小；不削之，其反迟，祸大。'", diangu: "晁错建议汉景帝削减诸侯封地，以巩固中央集权。结果引发七国之乱，晁错被汉景帝下令处死。", jieqian: "此签为中上签，表示改革有风险，但不得不为。若问事业，若有弊端当改革，但要注意方式方法。提醒谨慎行事。" },
+            { number: 35, level: "中平", title: "卫青霍去病", ancient: "卫青、霍去病者，汉名将也。出击匈奴，身先士卒，战无不胜，攻无不克，封狼居胥。", diangu: "卫青、霍去病是汉武帝时期抗击匈奴的名将，霍去病更有'匈奴未灭，无以家为'的名言。", jieqian: "此签为中平签，表示成功需要实力与机遇。若问学业，当努力充实自己；若问事业，当把握机会。运势尚可。" },
+            { number: 36, level: "中平", title: "苏武牧羊", ancient: "律知武终不可胁，白单于。单于乃幽武北海上，杖汉节牧羊，卧起操持，节旄尽落。", diangu: "苏武出使匈奴被扣，匈奴威逼利诱，苏武不降。被放逐到北海牧羊十九年，始终手持汉朝节杖，终归汉朝。", jieqian: "此签为中平签，表示坚守气节，终有回报。若问学业，当坚持不懈；若问事业，当守正不阿。考验耐心。" },
+            { number: 37, level: "中下", title: "司马迁写史记", ancient: "人固有一死，或重于泰山，或轻于鸿毛。仆虽怯懦，亦欲苟活于此世。", diangu: "司马迁因李陵之祸，被处以宫刑。但他忍辱负重，发愤著书，终于完成《史记》这部史学巨著。", jieqian: "此签为中下签，表示遭遇挫折，但意志坚定。若问学业，当百折不挠；若问事业，当忍辱负重。终有成就。" },
+            { number: 38, level: "下上", title: "昭君出塞", ancient: "竟宁元年，单于自言愿婿汉氏以自亲。元帝以后宫良家子王嫱字昭君赐单于。", diangu: "王昭君自请嫁匈奴单于，为汉匈和平作出贡献。其故事成为中国历史上民族融合的佳话。", jieqian: "此签为下上签，表示为大局牺牲小我。若问学业，当有大局观；若问感情，恐有离别之痛。但终将留名。" },
+            { number: 39, level: "下中", title: "王莽篡汉", ancient: "初始元年，王莽篡汉，建立新朝。实行新政，改制更化，天下大乱。", diangu: "王莽以外戚身份篡夺汉朝政权，建立新朝，推行一系列改革，史称'王莽改制'，但最终失败。", jieqian: "此签为下中签，表示谋逆篡位，天理不容。若问事业，当走正路不行邪道；若问感情，当防第三者插足。提醒走正道。" },
+            { number: 40, level: "下下", title: "绿林赤眉起义", ancient: "王莽天凤年间，荆州一带发生大旱，农民起义。起义军以绿林山为根据地，号'绿林军'。", diangu: "王莽统治末期，天下大乱。绿林军和赤眉军起义，推翻王莽统治，后刘秀建立东汉。", jieqian: "此签为下下签，表示天下大乱，民不聊生。若问学业，恐有时局动荡之虞；若问事业，当谨慎小心。保存实力为上。" },
+            { number: 41, level: "上上", title: "刘秀中兴", ancient: "光武皇帝讳秀，字文叔。起兵讨莽，会兵昆阳，莽军大败。遂灭新莽，复高祖之业。", diangu: "刘秀在昆阳之战中以少胜多，大败王莽军队。后统一天下，建立东汉，史称'光武中兴'。", jieqian: "此签为上上吉签，表示乱世出英雄，中兴有望。若问事业，可把握时机崛起；若问感情，缘分将至。运势极佳。" },
+            { number: 42, level: "上中", title: "汉明帝求佛", ancient: "永平七年，明帝夜梦金人，身有日光，飞翔殿庭。博士傅毅曰：'此天竺得道者，号佛。'", diangu: "汉明帝夜梦金人，派使者赴西域求佛，迎回佛像与佛经，在洛阳建白马寺，为佛教传入中国之始。", jieqian: "此签为上中吉签，表示信仰得力，心有所依。若问学业，当有精神寄托；若问事业，当寻求指导。运势平稳。" },
+            { number: 43, level: "上下", title: "班超投笔从戎", ancient: "班超字仲升，扶风平陵人。为人大志，不修细节。常为官佣书以供养，久劳苦。尝辍业投笔叹曰：'大丈夫无它志略，犹当效张骞立功异域。'", diangu: "班超少年时为官府抄书度日，后投笔从戎，出使西域三十余年，平定西域五十余国，封定远侯。", jieqian: "此签为上下吉签，表示改变志向，另谋发展。若问学业，当转换方向；若问事业，当勇于尝试。开创一番新天地。" },
+            { number: 44, level: "中上", title: "蔡伦造纸", ancient: "伦乃造意，用树肤、麻头及敝布、鱼网以为纸。元兴元年奏上之，帝善其能，自是莫不从用焉。", diangu: "蔡伦总结前人经验，发明用树皮、麻头、破布等为原料造纸，被后世尊为'纸圣'，是中国四大发明之一。", jieqian: "此签为中上吉签，表示发明创造，有益后世。若问学业，当有所创新；若问事业，当推陈出新。运势上升。" },
+            { number: 45, level: "中平", title: "张衡观天", ancient: "张衡字平子，善机巧，尤致思于天文、阴阳、历算。作地动仪，以精铜铸成，圆径八尺。", diangu: "张衡发明地动仪，是世界上第一台测定地震方位的仪器。其在天文、数学等方面也有杰出贡献。", jieqian: "此签为中平签，表示科技进步，但难以被理解。若问学业，当深入研究；若问事业，当有独到见解。需要耐心。" },
+            { number: 46, level: "中平", title: "华佗行医", ancient: "华佗字元化，沛国谯人。游学徐土，兼通数经。晓养性之术，年且百岁而貌有壮容。", diangu: "华佗是东汉名医，擅长外科，发明麻沸散，开手术之先河。后因不愿专为曹操侍医，被曹操所杀。", jieqian: "此签为中平签，表示医者仁心，但命运多舛。若问健康，当注意身体；若问事业，有济世之心。提醒保重身体。" },
+            { number: 47, level: "中下", title: "董卓之乱", ancient: "董卓字仲颖，陇西临洮人。率兵入洛阳，废少帝，立献帝。纵兵劫掠，洛阳残破。", diangu: "董卓率军入京，废少帝立献帝，迁都长安，放火焚烧洛阳，致使东汉元气大伤，天下大乱。", jieqian: "此签为中下签，表示祸国殃民，必遭报应。若问学业，恐有小人作祟；若问事业，当防小人当道。提醒走正道。" },
+            { number: 48, level: "下上", title: "王允献连环计", ancient: "王允设计，以貂蝉布施吕布，又遗董卓。布怒，杀卓于宫中。卓将李傕、郭汜引兵攻长安。", diangu: "王允用貂蝉设连环计，离间吕布与董卓关系，终借吕布之手杀死董卓，但随后李傕、郭汜攻入长安，王允被杀。", jieqian: "此签为下上签，表示用计除敌，但后果难料。若问学业，当用智取；若问感情，恐有第三者。需谨慎行事。" },
+            { number: 49, level: "下中", title: "吕布戏貂蝉", ancient: "吕布拔卓头悬马鞍桥，步出战场，与李傕等战于虎牢关。三英战吕布，吕布败走。", diangu: "吕布杀董卓后，与貂蝉相遇。但吕布反复无常，最终在下邳被曹操擒杀，一代猛将就此陨落。", jieqian: "此签为下中签，表示英雄难过美人关。若问感情，恐有纠葛；若问事业，当断则断。反复无常，终无所成。" },
+            { number: 50, level: "下下", title: "曹操挟天子以令诸侯", ancient: "建安元年，曹操迎天子都许。自此政归曹氏，天子守位而已。然曹氏功业，终为司马氏所夺。", diangu: "曹操迎汉献帝迁都许昌，挟天子以令诸侯，成为实际上的统治者。但其打下的基业，最终被司马氏夺取。", jieqian: "此签为下下签，表示得位不正，终难长久。若问事业，恐有算计之人；若问感情，当防第三者。提醒行得正坐得端。" },
+            { number: 51, level: "上上", title: "刘备三顾茅庐", ancient: "先帝不以臣卑鄙，猥自枉屈，三顾臣于草庐之中，咨臣以当世之事，由是感激，遂许先帝以驱驰。", diangu: "刘备三次拜访诸葛亮，终于请得卧龙先生出山相助。诸葛亮提出隆中对策，为刘备谋划天下大计。", jieqian: "此签为上上吉签，表示求贤若渴，必得良才。若问学业，有名师指点；若问事业，有贵人相助。运势极佳。" },
+            { number: 52, level: "上中", title: "诸葛亮草船借箭", ancient: "大雾垂江，诸葛亮命随船束草千余，分布两边擂鼓呐喊。曹军不敢出战，遂以箭射之。", diangu: "周瑜限诸葛亮三天造十万支箭，诸葛亮利用大雾天气，向曹操'借'箭，圆满完成任务。", jieqian: "此签为上中吉签，表示善用智谋，以少胜多。若问学业，当善用方法；若问事业，当巧干而非蛮干。运势上升。" },
+            { number: 53, level: "上下", title: "关云长过五关斩六将", ancient: "关公挂印封金，辞操北上寻兄。过东岭、洛阳、沂水、荥阳、滑州五关，连斩孔秀、孟坦等六将。", diangu: "关羽得知刘备下落，挂印封金辞别曹操，过五关斩六将，终于与刘备、张飞重聚。其忠义之气，千古流芳。", jieqian: "此签为上下吉签，表示忠义无双，一往无前。若问学业，当坚定信念；若问感情，当忠诚不渝。运势较好。" },
+            { number: 54, level: "中上", title: "张飞喝断当阳桥", ancient: "张飞率二十余骑，立于当阳桥上，一声大喝，喝断桥梁，吓退曹操百万大军。", diangu: "张飞在当阳桥以少敌多，一声大喝震断桥梁，曹军以为有伏兵，不敢追击，为刘备争取了撤退时间。", jieqian: "此签为中上签，表示气势磅礴，吓退敌人。若问学业，当有胆识；若问事业，当有气势。运势上升。" },
+            { number: 55, level: "中平", title: "赵云单骑救主", ancient: "赵云怀抱后主，直透重围，砍倒大旗两面，夺槊三条；前后枪刺剑砍，杀死曹营名将五十余员。", diangu: "刘备败于当阳长坂，赵云匹马单枪，在曹营中七进七出，救出甘夫人与后主刘禅。", jieqian: "此签为中平签，表示忠诚护主，临危不惧。若问学业，当全力以赴；若问感情，当真心守护。考验忠诚。" },
+            { number: 56, level: "中平", title: "周瑜赤壁破曹", ancient: "豫州军虽败于长坂，今战士还者及关羽水军精甲万人，刘琦合江夏战士亦不下万人。", diangu: "周瑜在赤壁以火攻大破曹操八十万大军，奠定三国鼎立的基础。此战是中国历史上最著名的以少胜多之战。", jieqian: "此签为中平签，表示以弱胜强，需要智慧。若问学业，当以智取胜；若问事业，需借助外力。运势尚可。" },
+            { number: 57, level: "中下", title: "周瑜三气身亡", ancient: "周瑜与曹仁相持，甘宁请取夷陵。周瑜用计取之。曹仁败走。周瑜因箭伤发作，卒于巴丘。", diangu: "周瑜为争荆州，先后三次被诸葛亮气到，最终箭伤发作，英年早逝。临死前发出'既生瑜，何生亮'的感叹。", jieqian: "此签为中下签，表示气大伤身，忌妒误事。若问学业，勿与人争一时之气；若问事业，当宽宏大量。提醒修身养性。" },
+            { number: 58, level: "下上", title: "华容道关羽释曹操", ancient: "曹军至华容道，关羽列阵以待。曹操向前告曰：'将军一向安好！'关羽回顾，曹操等已纵马穿阵而过。", diangu: "曹操败走华容道，遇到关羽。关羽感念曹操昔日恩情，违背军令状，放走了曹操。", jieqian: "此签为下上签，表示知恩图报，以德报怨。若问学业，当铭记恩情；若问感情，当以诚待人。运势回升。" },
+            { number: 59, level: "下中", title: "曹操煮酒论英雄", ancient: "操曰：'今天下英雄，唯使君与操耳！'玄德闻言，吃了一惊，手中所执匙箸，不觉落于地下。", diangu: "曹操与刘备青梅煮酒论英雄，曹操说天下英雄只有刘备和自己，刘备闻言大惊，筷子落地。", jieqian: "此签为下中签，表示英雄相惜，暗藏机锋。若问学业，当藏拙示弱；若问事业，当谨言慎行。需小心应对。" },
+            { number: 60, level: "下下", title: "刘备白帝城托孤", ancient: "先主泣曰：'君才十倍曹丕，必能安国，终定大事。若嗣子可辅，辅之；如其不才，君可自取。'", diangu: "刘备在夷陵之战后病逝于白帝城，临终将刘禅托付给诸葛亮，诸葛亮感激涕零，誓言辅佐刘禅至死。", jieqian: "此签为下下签，表示托付非人，令人担忧。若问学业，恐有失望；若问事业，当防后继无人。提醒早做安排。" },
+            { number: 61, level: "上上", title: "诸葛亮出师表", ancient: "先帝创业未半而中道崩殂，今天下三分，益州疲敝，此诚危急存亡之秋也。", diangu: "诸葛亮为完成刘备遗愿，率军北伐中原，临行前上《出师表》表明心志，忠义之心溢于言表。", jieqian: "此签为上上吉签，表示鞠躬尽瘁，死而后已。若问学业，当有使命感；若问事业，当尽职尽责。运势极佳。" },
+            { number: 62, level: "上中", title: "诸葛亮挥泪斩马谡", ancient: "谡违亮节度，举措烦扰，舍水上山，不在据城。郃绝其汲道，大败街亭。", diangu: "马谡失街亭，导致诸葛亮第一次北伐失败。诸葛亮挥泪斩马谡，并上书自贬三级，以谢失察之罪。", jieqian: "此签为上中签，表示执法如山，不徇私情。若问学业，当严于律己；若问事业，当赏罚分明。运势平稳。" },
+            { number: 63, level: "上下", title: "姜维九伐中原", ancient: "姜维总戎诸葛亮之志，继承武侯遗志，先后九次伐魏，虽未能成功，但其忠诚可嘉。", diangu: "姜维继承诸葛亮遗志，九次率军北伐中原，虽未能恢复汉室，但其忠诚与坚持令人敬佩。", jieqian: "此签为上下吉签，表示虽败犹荣，意志坚定。若问学业，当坚持不懈；若问事业，当不轻言放弃。精神可嘉。" },
+            { number: 64, level: "中上", title: "邓艾偷渡阴平", ancient: "艾以毡自裹，推转下山，将士皆攀木缘崖，鱼贯而进。江油守将马邈降。", diangu: "邓艾率军从阴平小路翻山越岭，偷渡蜀汉，以奇兵致胜，攻入成都，刘禅出降，蜀汉灭亡。", jieqian: "此签为中上签，表示出奇制胜，另辟蹊径。若问学业，当独辟蹊径；若问事业，当创新方法。运势上升。" },
+            { number: 65, level: "中平", title: "乐不思蜀", ancient: "司马文王问刘禅曰：'颇思蜀否？'禅曰：'此间乐，不思蜀。'郤正闻之，谓禅曰：'若王后问，宜泣而答曰：先人坟墓远在陇、蜀，乃心西悲，无日不思。'", diangu: "刘禅投降后，被迁至洛阳。司马昭问他是否思念蜀国，刘禅回答'乐不思蜀'，成为千古笑柄。", jieqian: "此签为中平签，表示乐不思蜀，不思进取。若问学业，恐有贪图享乐之虞；若问事业，当居安思危。提醒勿忘本。" },
+            { number: 66, level: "中平", title: "竹林七贤", ancient: "嵇康、阮籍、山涛、向秀、刘伶、王戎、阮咸七人，常集于竹林之下，肆意酣畅。", diangu: "魏晋时期，嵇康等七位名士常聚于竹林中，饮酒清谈，抨击时政，表达对黑暗政治的不满。", jieqian: "此签为中平签，表示名士风骨，不同流合污。若问学业，当有独立人格；若问感情，当保持真我。运势一般。" },
+            { number: 67, level: "中下", title: "王羲之兰亭序", ancient: "永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。", diangu: "王羲之与友人于兰亭修禊，作《兰亭集序》，书法与文章皆为千古绝唱，被后世尊为'书圣'。", jieqian: "此签为中下签，表示文人雅集，但人生短暂。若问学业，当珍惜时光；若问感情，当及时行乐。感慨时光。" },
+            { number: 68, level: "下上", title: "陶渊明归去来兮", ancient: "归去来兮，田园将芜胡不归？既自以心为形役，奚惆怅而独悲？", diangu: "陶渊明不愿为五斗米折腰，辞官归隐，作《归去来兮辞》，开创中国田园诗派。", jieqian: "此签为下上签，表示辞官归隐，超然物外。若问学业，当知进退；若问事业，当放下名利。回归本真。" },
+            { number: 69, level: "下中", title: "谢安淝水之战", ancient: "苻坚率兵百万次于淮淝，晋兵不过八万。谢安围棋赌墅，从容部署，晋兵大胜。", diangu: "前秦苻坚率百万大军南侵，谢安指挥八万晋军，在淝水之战中大败前秦军，保住了东晋江山。", jieqian: "此签为下中签，表示以少胜多，需有定力。若问学业，当稳住心态；若问事业，当临危不乱。运势反复。" },
+            { number: 70, level: "下下", title: "梁武帝佞佛", ancient: "梁武帝三次舍身同泰寺，群臣以钱亿万赎之。帝晚年佞佛，不理朝政，终致侯景之乱。", diangu: "梁武帝萧衍晚年沉迷佛教，三次出家为僧，花费巨额钱财赎身，最终导致侯景之乱，梁朝覆灭。", jieqian: "此签为下下签，表示沉迷旁门左道，误国误身。若问学业，恐误入歧途；若问事业，当防沉迷。提醒正道行事。" },
+            { number: 71, level: "上上", title: "隋炀帝开运河", ancient: "隋炀帝开通济渠，自长安至江都，凡五千余里。龙舟所过，香闻数里。", diangu: "隋炀帝开凿大运河，虽耗尽民力，但也促进了南北经济文化交流，是一项功在千秋的工程。", jieqian: "此签为上上吉签，表示功在当代，利在千秋。若问学业，当有长远眼光；若问事业，当有宏大格局。运势极佳。" },
+            { number: 72, level: "上中", title: "李世民玄武门之变", ancient: "六月四日，玄武门之变。太子建成、齐王元吉死。高祖立李世民为太子。", diangu: "李世民在玄武门发动政变，杀死太子李建成和齐王李元吉，逼迫父亲李渊立自己为太子，后传位为帝。", jieqian: "此签为上中签，表示夺权上位，争议较大。若问学业，当果断决策；若问事业，当机立断。运势较强。" },
+            { number: 73, level: "上下", title: "魏征直谏", ancient: "魏征状貌不逾中人，有胆略，善挽回人主意。每犯颜进谏，虽遇帝盛怒，神色不移。", diangu: "魏征是唐太宗时期的著名谏臣，先后上谏两百多次，直言不讳，被太宗视为镜子。", jieqian: "此签为上下吉签，表示忠言直谏，难能可贵。若问学业，当虚心接受意见；若问感情，当坦诚相待。运势较好。" },
+            { number: 74, level: "中上", title: "玄奘取经", ancient: "贞观三年，玄奘法师西行求法，历经艰难险阻，九死一生，终于到达印度，取回真经。", diangu: "玄奘法师为求佛法，独自西行，历经十七年，从印度取回六百余部佛经，为佛教中国化做出巨大贡献。", jieqian: "此签为中上吉签，表示历经艰辛，终成正果。若问学业，当有恒心和毅力；若问感情，当经历考验。运势上升。" },
+            { number: 75, level: "中平", title: "武则天称帝", ancient: "神龙元年，张柬之等起兵讨武则天。则天传位太子，唐中宗复位，周朝亡。", diangu: "武则天是中国历史上唯一的女皇帝，建立武周政权，执政十五年，晚年被逼退位，唐朝复辟。", jieqian: "此签为中平签，表示女性当政，争议较大。若问学业，当突破常规；若问事业，当敢为人先。运势反复。" },
+            { number: 76, level: "中平", title: "杨贵妃荔枝", ancient: "一骑红尘妃子笑，无人知是荔枝来。唐玄宗为博杨贵妃一笑，不惜千里运送荔枝。", diangu: "唐玄宗宠爱杨贵妃，为满足她爱吃荔枝的喜好，命人从岭南快马加鞭运送荔枝到长安，留下千古佳话。", jieqian: "此签为中平签，表示为博红颜一笑，不惜代价。若问学业，恐过于沉迷；若问感情，用心良苦。运势一般。" },
+            { number: 77, level: "中下", title: "安史之乱", ancient: "渔阳鼙鼓动地来，惊破霓裳羽衣曲。九重城阙烟尘生，千乘万骑西南行。", diangu: "安禄山、史思明发动叛乱，唐玄宗仓皇逃往四川，马嵬驿发生兵变，杨贵妃被逼自缢。", jieqian: "此签为中下签，表示战乱动荡，民不聊生。若问学业，恐有时局影响；若问事业，当谨慎行事。保存实力为上。" },
+            { number: 78, level: "下上", title: "颜真卿书法", ancient: "点画刚劲有力，结体庄重雄伟，气势磅礴，堂堂正正，如忠臣义士，正色立朝。", diangu: "颜真卿是唐代著名书法家，其楷书端庄雄伟，行书气势遒劲，创颜体书法，对后世影响深远。", jieqian: "此签为下上签，表示刚正不阿，气节高尚。若问学业，当有正气；若问事业，当有骨气。运势上升。" },
+            { number: 79, level: "下中", title: "李白醉酒捞月", ancient: "李白在当涂江上饮酒，见月影在水中，举杯邀月，因醉下水捞月，遂溺死。", diangu: "李白晚年漂泊于当涂，与友人饮酒赏月，醉酒后跳入江中捞月，不幸溺亡，一代诗仙就此陨落。", jieqian: "此签为下中签，表示浪漫主义，因酒误事。若问学业，恐过于浪漫；若问感情，当防沉迷。提醒脚踏实地。" },
+            { number: 80, level: "下下", title: "杜甫怀才不遇", ancient: "安得广厦千万间，大庇天下寒士俱欢颜。吾庐独破受冻死亦足。", diangu: "杜甫是唐代伟大的现实主义诗人，一生漂泊潦倒，但其忧国忧民的情怀令人敬仰。", jieqian: "此签为下下签，表示怀才不遇，壮志难酬。若问学业，恐有挫折；若问事业，当坚持理想。命运多舛。" },
+            { number: 81, level: "上上", title: "赵匡胤陈桥兵变", ancient: "陈桥兵变，赵匡胤被部下黄袍加身，建立宋朝。杯酒释兵权，稳固皇权。", diangu: "赵匡胤在陈桥驿被部下披上黄袍，拥立为帝，建立宋朝。后通过杯酒释兵权，解除武将兵权，稳固统治。", jieqian: "此签为上上吉签，表示黄袍加身，时来运转。若问学业，有出头之日；若问事业，时机已到。运势极佳。" },
+            { number: 82, level: "上中", title: "包拯打龙袍", ancient: "包拯铁面无私，审狸猫换太子案，打龙袍问责皇帝，终使案情大白。", diangu: "包拯是北宋名臣，以公正廉洁、铁面无私著称。他审理狸猫换太子案，敢于直谏皇帝，被誉为'包青天'。", jieqian: "此签为上中吉签，表示公正无私，为民请命。若问学业，当公平正直；若问事业，当清正廉洁。运势较好。" },
+            { number: 83, level: "上下", title: "范仲淹岳阳楼记", ancient: "先天下之忧而忧，后天下之乐而乐。其为人也，患不能之耳。", diangu: "范仲淹写下《岳阳楼记》，提出'先天下之忧而忧，后天下之乐而乐'的千古名句，成为士人楷模。", jieqian: "此签为上下吉签，表示忧国忧民，胸怀天下。若问学业，当有大志；若问感情，当有担当。运势平稳。" },
+            { number: 84, level: "中上", title: "王安石变法", ancient: "天变不足畏，祖宗不足法，人言不足恤。王安石变法，推行新法，改革政治。", diangu: "王安石在宋神宗支持下推行新法，试图富国强兵，但因触犯旧党利益，遭到反对，最终失败。", jieqian: "此签为中上签，表示变法改革，阻力较大。若问学业，当有新思维；若问事业，当有改革精神。运势反复。" },
+            { number: 85, level: "中平", title: "苏轼赤壁赋", ancient: "清风徐来，水波不兴。举酒属客，诵明月之诗，歌窈窕之章。", diangu: "苏轼被贬黄州时，与友人泛舟赤壁，写下《赤壁赋》，表达其豁达超脱的人生观。", jieqian: "此签为中平签，表示豁达乐观，随遇而安。若问学业，当调整心态；若问感情，当顺其自然。运势一般。" },
+            { number: 86, level: "中平", title: "岳飞精忠报国", ancient: "怒发冲冠，凭栏处、潇潇雨歇。抬望眼，仰天长啸，壮怀激烈。三十功名尘与土，八千里路云和月。", diangu: "岳飞是南宋抗金名将，率领岳家军北上抗敌，誓言'直捣黄龙府，迎回二圣'，却被秦桧以莫须有罪名害死。", jieqian: "此签为中平签，表示精忠报国，却遭陷害。若问学业，当明辨是非；若问事业，当防小人。悲剧色彩。" },
+            { number: 87, level: "中下", title: "秦桧害岳飞", ancient: "青山有幸埋忠骨，白铁无辜铸佞臣。岳飞以'莫须有'之罪被害于风波亭。", diangu: "秦桧是南宋奸臣，以'莫须有'的罪名害死岳飞，留下千古骂名。后人在岳飞墓前铸有秦桧跪像。", jieqian: "此签为中下签，表示奸臣当道，忠臣受害。若问学业，恐遇小人；若问事业，当防陷害。提醒明辨忠奸。" },
+            { number: 88, level: "下上", title: "文天祥正气歌", ancient: "天地有正气，杂然赋流形。下则为河岳，上则为日星。于人曰浩然，沛乎塞苍冥。", diangu: "文天祥是南宋末年名臣，率军抗元，兵败被俘，不屈而死。其《正气歌》表达宁死不屈的民族气节。", jieqian: "此签为下上签，表示正气凛然，宁死不屈。若问学业，当有气节；若问感情，当坚贞不渝。运势上升。" },
+            { number: 89, level: "下中", title: "崖山之后无中国", ancient: "崖山之战，陆秀夫负帝投海，南宋灭亡。中国第一次被外族完全统治。", diangu: "崖山之战，南宋最后的军队被元军击败，宰相陆秀夫背着南宋末帝跳海自尽，南宋灭亡。", jieqian: "此签为下中签，表示亡国灭种，悲剧结局。若问学业，恐有国难影响；若问事业，当铭记历史。悲剧色彩。" },
+            { number: 90, level: "下下", title: "贾似道误国", ancient: "贾似道瞒报军情，致使元军南下。南宋岌岌可危，终至灭亡。", diangu: "贾似道是南宋末年权臣，在抗元战争中谎报军情，误国误民，加速了南宋的灭亡。", jieqian: "此签为下下签，表示奸臣误国，罪不可恕。若问学业，勿弄虚作假；若问事业，当实事求是。提醒脚踏实地。" },
+            { number: 91, level: "上上", title: "朱元璋建立明朝", ancient: "驱逐胡虏，恢复中华。立纲陈纪，救济斯民。乞丐皇帝，建立大明。", diangu: "朱元璋出身乞丐，参加红巾军起义，最终推翻元朝，建立明朝，统一中国。", jieqian: "此签为上上吉签，表示出身低微，终成大业。若问学业，当有远大志向；若问事业，白手起家终能成功。运势极佳。" },
+            { number: 92, level: "上中", title: "郑和下西洋", ancient: "郑和率船队七下西洋，遍历三十余国，宣扬国威，开辟海上丝绸之路。", diangu: "郑和是明代著名航海家，率船队七次下西洋，最远到达非洲东海岸，开辟了中国到海外的航路。", jieqian: "此签为上中吉签，表示远航冒险，开疆拓土。若问学业，当有探索精神；若问事业，当勇于开拓。运势上升。" },
+            { number: 93, level: "上下", title: "于谦保卫北京", ancient: "粉骨碎身浑不怕，要留清白在人间。于谦率军抵抗瓦剌，保卫北京。", diangu: "土木堡之变后，于谦临危受命，率军抵抗瓦剌，保卫北京城，挽狂澜于既倒，扶大厦于将倾。", jieqian: "此签为上下吉签，表示临危受命，挽狂澜于既倒。若问学业，当临危不乱；若问事业，当勇于担当。运势较好。" },
+            { number: 94, level: "中上", title: "张居正改革", ancient: "万历年间，张居正推行一条鞭法，整顿吏治，改革赋役制度。", diangu: "张居正在万历年间推行改革，实行一条鞭法，整顿吏治，使明朝一度中兴。", jieqian: "此签为中上签，表示改革图强，力挽狂澜。若问学业，当有创新精神；若问事业，当勇于改革。运势上升。" },
+            { number: 95, level: "中平", title: "海瑞罢官", ancient: "海瑞为官清廉，刚正不阿，因直言进谏被罢官。", diangu: "海瑞是明代著名清官，因弹劾权贵被罢官，但他清廉正直的名声流传千古。", jieqian: "此签为中平签，表示清廉正直，但仕途不顺。若问学业，当保持正直；若问事业，当守正不阿。虽有波折，终留清名。" },
+            { number: 96, level: "中下", title: "李自成起义", ancient: "迎闯王，不纳粮。李自成率农民军攻入北京，崇祯自缢，明朝灭亡。", diangu: "李自成率领农民起义军，提出'均田免赋'口号，攻入北京，推翻明朝。但入京后迅速腐化，最终失败。", jieqian: "此签为中下签，表示一时成功，终难长久。若问事业，当戒骄戒躁；若问感情，恐有始无终。提醒保持初心。" },
+            { number: 97, level: "下上", title: "吴三桂降清", ancient: "恸哭六军俱缟素，冲冠一怒为红颜。吴三桂引清兵入关，改变历史进程。", diangu: "吴三桂为报家仇和夺妻之恨，引清兵入关，击败李自成。后又起兵反清，最终失败。", jieqian: "此签为下上签，表示爱恨交织，命运多舛。若问感情，当理性对待；若问事业，当慎重抉择。结局难料。" },
+            { number: 98, level: "下中", title: "郑成功收复台湾", ancient: "开辟荆榛逐荷夷，十年始克复先基。田横尚有三千客，茹苦间关不忍离。", diangu: "郑成功率军击败荷兰殖民者，收复台湾，成为民族英雄。", jieqian: "此签为下中签，表示历经艰辛，终成大业。若问学业，当坚持不懈；若问事业，当克服困难。终有成就。" },
+            { number: 99, level: "下下", title: "雍正夺嫡", ancient: "九子夺嫡，血雨腥风。雍正登基，整顿吏治，巩固皇权。", diangu: "康熙晚年，九位皇子争夺皇位，雍正最终胜出。他在位期间推行改革，加强中央集权。", jieqian: "此签为下下签，表示兄弟相争，骨肉相残。若问人际关系，当和睦相处；若问事业，当避免内斗。家和万事兴。" },
+            { number: 100, level: "上上", title: "乾隆盛世", ancient: "康乾盛世，国泰民安。乾隆皇帝统治时期，清朝达到鼎盛。", diangu: "乾隆时期，清朝国力达到顶峰，经济繁荣，文化昌盛。但同时也埋下了衰败的种子。", jieqian: "此签为上上吉签，表示盛世太平，万事如意。若问学业，当趁势而上；若问事业，当把握良机。运势极佳，心想事成。" }
+        ];
+
+        let currentFortune = null;
+
+        function getHuangli() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[now.getDay()];
+            
+            const zodiacs = ['鼠', '牛', '虎', '兔', '龙', '蛇', '马', '羊', '猴', '鸡', '狗', '猪'];
+            const zodiac = zodiacs[(year - 1984) % 12];
+            
+            const gan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+            const zhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            const ganIndex = (year - 4) % 10;
+            const zhiIndex = (year - 4) % 12;
+            const yearGanZhi = gan[ganIndex] + zhi[zhiIndex] + '年';
+            
+            document.getElementById('jiazi').textContent = yearGanZhi + ' ' + zodiac + '年';
+            document.getElementById('huangliContent').innerHTML = `今日：${month}月${day}日 星期${weekday}<br>宜：祈福、祭祀、求签、出行<br>忌：动土、破土、安葬`;
+        }
+
+        function shakeGourd() {
+            const gourd = document.getElementById('gourd');
+            gourd.classList.add('shaking');
+            
+            setTimeout(() => {
+                gourd.classList.remove('shaking');
+                drawFortune();
+            }, 3000);
+        }
+
+        function drawFortune() {
+            const index = Math.floor(Math.random() * fortunes.length);
+            currentFortune = fortunes[index];
+            
+            document.getElementById('stickNumber').textContent = `第${currentFortune.number}签`;
+            document.getElementById('stickLevel').textContent = currentFortune.level;
+            document.getElementById('stickTitle').textContent = currentFortune.title;
+            document.getElementById('stickAncientText').textContent = currentFortune.ancient;
+            
+            showPage('stickRevealPage');
+        }
+
+        function showFortuneDetail() {
+            document.getElementById('detailNumber').textContent = `第${currentFortune.number}签`;
+            document.getElementById('detailLevel').textContent = currentFortune.level;
+            document.getElementById('detailTitle').textContent = currentFortune.title;
+            document.getElementById('detailAncientText').textContent = currentFortune.ancient;
+            
+            showPage('fortuneDetailPage');
+        }
+
+        function showDianGu() {
+            document.getElementById('dianguTitle').textContent = currentFortune.title + ' - 典故';
+            document.getElementById('dianguContent').textContent = currentFortune.diangu;
+            
+            showPage('dianguPage');
+        }
+
+        function showJieQian() {
+            document.getElementById('jieqianTitle').textContent = currentFortune.title + ' - 解签';
+            document.getElementById('jieqianContent').textContent = currentFortune.jieqian;
+            
+            // 根据签的级别生成分项预示
+            const predictions = generatePredictions(currentFortune.level);
+            document.getElementById('prediction-wealth').textContent = predictions.wealth;
+            document.getElementById('prediction-career').textContent = predictions.career;
+            document.getElementById('prediction-study').textContent = predictions.study;
+            document.getElementById('prediction-planning').textContent = predictions.planning;
+            document.getElementById('prediction-love').textContent = predictions.love;
+            document.getElementById('prediction-health').textContent = predictions.health;
+            
+            // 根据签的级别生成注意事项
+            const attentions = generateAttentions(currentFortune.level);
+            const attentionList = document.getElementById('attentionList');
+            attentionList.innerHTML = attentions.map(item => `<li>${item}</li>`).join('');
+            
+            showPage('jieqianPage');
+        }
+        
+        function generatePredictions(level) {
+            const predictions = {
+                '上上': { wealth: '财运亨通，财源广进', career: '事业顺利，步步高升', study: '学业精进，名列前茅', planning: '谋事有成，心想事成', love: '感情美满，姻缘天成', health: '身体健康，平安顺遂' },
+                '上中': { wealth: '财运尚可，小有积蓄', career: '事业稳定，稳步发展', study: '学业进步，成绩优良', planning: '谋事可成，需努力', love: '感情稳定，和谐美满', health: '身体康泰，注意保养' },
+                '上下': { wealth: '财运起伏，宜守不宜进', career: '事业有起伏，需谨慎', study: '学业有波动，需努力', planning: '谋事有变数，需谨慎', love: '感情有变数，需珍惜', health: '身体尚可，注意休息' },
+                '中上': { wealth: '财运一般，需努力', career: '事业有机会，需把握', study: '学业有机会，需争取', planning: '谋事有机缘，需主动', love: '感情有机会，需主动', health: '身体一般，注意调理' },
+                '中平': { wealth: '财运平稳，无大波澜', career: '事业平淡，宜守成', study: '学业平稳，需坚持', planning: '谋事平淡，需耐心', love: '感情平淡，需经营', health: '身体平稳，注意养生' },
+                '中下': { wealth: '财运欠佳，需谨慎投资', career: '事业受阻，需忍耐', study: '学业受阻，需加倍努力', planning: '谋事不顺，需调整', love: '感情有困扰，需沟通', health: '身体欠佳，需注意' },
+                '下上': { wealth: '财运较差，宜节俭', career: '事业不顺，需反思', study: '学业不顺，需改进方法', planning: '谋事难成，需等待', love: '感情波折，需包容', health: '身体较弱，需调养' },
+                '下中': { wealth: '财运低迷，不宜冒险', career: '事业困难，需坚持', study: '学业困难，需多请教', planning: '谋事艰难，需忍耐', love: '感情危机，需挽回', health: '身体欠佳，需就医' },
+                '下下': { wealth: '财运不利，谨防破财', career: '事业受阻，需暂停', study: '学业受阻，需调整', planning: '谋事不成，另寻出路', love: '感情破裂，难挽回', health: '身体有恙，需重视' }
+            };
+            return predictions[level] || predictions['中平'];
+        }
+        
+        function generateAttentions(level) {
+            const attentions = {
+                '上上': ['把握良机，乘势而上', '保持谦逊，感恩惜福', '多行善事，积德行善', '不忘初心，继续努力'],
+                '上中': ['稳中求进，勿急功近利', '注意人际关系', '珍惜眼前机会', '保持良好心态'],
+                '上下': ['居安思危，未雨绸缪', '不宜盲目投资', '感情需用心经营', '注意劳逸结合'],
+                '中上': ['主动出击，把握机会', '增强自信，相信自己', '多学习提升能力', '注意身体健康'],
+                '中平': ['保持平常心，知足常乐', '不宜有太大变动', '多与家人沟通', '注意饮食规律'],
+                '中下': ['谨言慎行，避免口舌', '不宜做重大决策', '多听他人意见', '注意情绪调节'],
+                '下上': ['收敛锋芒，低调行事', '凡事三思而后行', '多反省自身不足', '注意休息养生'],
+                '下中': ['戒骄戒躁，脚踏实地', '避免与人争执', '谨慎处理财务', '及时就医检查'],
+                '下下': ['切勿冒险行事', '远离是非纷争', '多行善事化解', '立即就医检查']
+            };
+            return attentions[level] || attentions['中平'];
+        }
+
+        function backToDetail() {
+            showPage('fortuneDetailPage');
+        }
+
+        function backToHome() {
+            showPage('homePage');
+        }
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        window.onload = getHuangli;
+    </script>
+</body>
+</html>
